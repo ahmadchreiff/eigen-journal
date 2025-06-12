@@ -1,7 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { FiArrowRight, FiBookOpen, FiTrendingUp, FiUsers, FiStar, FiCalendar, FiEye, FiHeart, FiShare2 } from 'react-icons/fi';
 import Navbar from '@/components/Navbar';
 import Bottombar from '@/components/Bottombar';
+
+import Link from 'next/link';
 
 export default function Home() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -74,7 +77,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        
+
         {/* Floating Elements */}
         <div className="absolute top-20 left-10 w-20 h-20 bg-red-500 rounded-full opacity-20 animate-spin-slow"></div>
         <div className="absolute bottom-20 right-10 w-16 h-16 bg-blue-500 rounded-full opacity-20 animate-spin-reverse"></div>
@@ -106,7 +109,7 @@ export default function Home() {
               Spotlight on the most impactful and innovative research from our community
             </p>
           </div>
-          
+
           <div className="max-w-4xl mx-auto">
             <div className="bg-gradient-to-r from-red-600 to-blue-600 rounded-3xl p-1 shadow-2xl">
               <div className="bg-white rounded-3xl p-8 lg:p-12">
@@ -125,7 +128,7 @@ export default function Home() {
                       Quantum Computing Applications in Machine Learning Optimization
                     </h3>
                     <p className="text-gray-600 mb-6 leading-relaxed">
-                      This groundbreaking research explores the intersection of quantum computing and machine learning, 
+                      This groundbreaking research explores the intersection of quantum computing and machine learning,
                       presenting novel algorithms that achieve exponential speedup in optimization problems.
                     </p>
                     <div className="flex items-center gap-6 text-sm text-gray-500 mb-6">
@@ -175,7 +178,7 @@ export default function Home() {
               Dive deep into specialized fields of academic research and discovery
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {categories.map((category, index) => (
               <div key={index} className="group cursor-pointer">
@@ -209,10 +212,12 @@ export default function Home() {
               <FiUsers />
               Join Community
             </button>
-            <button className="border-2 border-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-red-600 transition-all duration-300 flex items-center justify-center gap-2">
-              <FiShare2 />
-              Submit Research
-            </button>
+            <Link href="/submit" passHref>
+              <button className="border-2 border-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-red-600 transition-all duration-300 flex items-center justify-center gap-2">
+                <FiShare2 />
+                Submit Research
+              </button>
+            </Link>
           </div>
         </div>
       </section>
