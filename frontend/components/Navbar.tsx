@@ -44,9 +44,9 @@ export default function Navbar() {
 
   const navItems = [
     { id: 'home', label: 'Home', href: '/' },
-    { id: 'cmps', label: 'Computer Science', href: '/articles?category=cmps' },
-    { id: 'math', label: 'Mathematics', href: '/articles?category=math' },
-    { id: 'phys', label: 'Physics', href: '/articles?category=phys' },
+    { id: 'cmps', label: 'Computer Science', href: '/cmps' },
+    { id: 'math', label: 'Mathematics', href: '/math' },
+    { id: 'phys', label: 'Physics', href: '/phys' },
     { id: 'about', label: 'About', href: '/about' }
   ];
 
