@@ -1,32 +1,18 @@
-const express = require("express");
+import express from 'express';
+import DraftArticle from '../models/DraftArticle.js';
+
 const router = express.Router();
-const Article = require("../models/Article");
 
-// GET all articles
-router.get("/", async (req, res) => {
+// POST /api/articles/submit
+router.post('/submit', async (req, res) => {
   try {
-    const articles = await Article.find().sort({ createdAt: -1 });
-    res.json(articles);
+    const draft = new DraftArticle(req.body);
+    await draft.save();
+    res.status(201).json({ message: 'Draft submitted successfully!' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Submission failed.' });
   }
 });
 
-// POST a new article
-router.post("/", async (req, res) => {
-  const { title, author, content, category } = req.body;
-
-  if (!title || !content || !category) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
-  try {
-    const article = new Article({ title, author, content, category });
-    const saved = await article.save();
-    res.status(201).json(saved);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-module.exports = router;
+export default router;
