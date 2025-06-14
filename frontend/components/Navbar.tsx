@@ -1,7 +1,7 @@
 import Link from 'next/link'; 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { FiBookmark, FiUser, FiSearch, FiMenu, FiX, FiChevronDown } from 'react-icons/fi';
+import { FiBookmark, FiUser, FiSearch, FiMenu, FiX, FiChevronDown, FiPlusCircle } from 'react-icons/fi';
 
 export default function Navbar() {
   const router = useRouter();
@@ -27,6 +27,8 @@ export default function Navbar() {
       setActiveSection('home');
     } else if (path === '/about') {
       setActiveSection('about');
+    } else if (path === '/submit') {
+      setActiveSection('submit');
     } else if (path === '/articles') {
       if (query.category === 'cmps') {
         setActiveSection('cmps');
@@ -127,6 +129,26 @@ export default function Navbar() {
                   )}
                 </Link>
               ))}
+              
+              {/* Submit Button - Special styling */}
+              <Link 
+                href="/submit"
+                className={`relative px-4 py-2 ml-2 rounded-lg font-semibold text-sm transition-all duration-300 flex items-center gap-2 ${activeSection === 'submit'
+                    ? isScrolled
+                      ? 'text-white bg-gradient-to-r from-red-600 to-blue-600 shadow-lg shadow-red-600/30'
+                      : 'text-white bg-white/30 backdrop-blur-sm border border-white/50'
+                    : isScrolled
+                      ? 'text-white bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 shadow-lg shadow-red-600/20'
+                      : 'text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30'
+                  }`}
+              >
+                <FiPlusCircle className="w-4 h-4" />
+                Submit
+                {activeSection === 'submit' && (
+                  <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 rounded-full ${isScrolled ? 'bg-white' : 'bg-white'
+                    }`} />
+                )}
+              </Link>
             </nav>
 
             {/* Right Section - Refined interactions */}
@@ -234,6 +256,21 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
+              
+              {/* Mobile Submit Button */}
+              <Link
+                href="/submit"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`block w-full text-left px-4 py-3 font-semibold transition-all duration-200 flex items-center gap-2 ${activeSection === 'submit'
+                    ? 'text-white bg-gradient-to-r from-red-600 to-blue-600 border-r-2 border-blue-600'
+                    : 'text-white bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700'
+                  }`}
+              >
+                <FiPlusCircle className="w-4 h-4" />
+                Submit Research
+              </Link>
             </nav>
 
             {/* Mobile Actions */}
