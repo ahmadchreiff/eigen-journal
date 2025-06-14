@@ -18,7 +18,7 @@ export default function SubmitPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/articles/submit', form);
+      await axios.post('http://localhost:5000/api/drafts/submit', form);
       setSubmitted(true);
     } catch (err) {
       alert('Error submitting article.');
