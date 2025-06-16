@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  FiUpload, FiUser, FiMail, FiBook, FiTag, FiFileText, FiImage, 
+import {
+  FiUpload, FiUser, FiMail, FiBook, FiTag, FiFileText, FiImage,
   FiArrowRight, FiArrowLeft, FiCheck, FiX, FiEye, FiSave,
   FiCalendar, FiClock, FiUsers, FiBookOpen, FiTrendingUp
 } from 'react-icons/fi';
@@ -16,16 +16,16 @@ interface FormData {
   affiliation: string;
   year: string;
   major: string;
-  
+
   // Article Information
   title: string;
   abstract: string;
   category: string;
   keywords: string[];
-  
+
   // Files
   articlePdf: File | null;
-  
+
   // Metadata
   isOriginalWork: boolean;
   hasEthicsApproval: boolean;
@@ -51,7 +51,7 @@ export default function SubmitResearch() {
     hasEthicsApproval: false,
     agreedToTerms: false
   });
-  
+
   const [keywordInput, setKeywordInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -112,12 +112,42 @@ export default function SubmitResearch() {
   };
 
   const handleSubmit = async () => {
+    if (!validateStep(currentStep)) return;
+
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsSubmitting(false);
-    // Handle success/error
+
+    try {
+      const formDataToSend = new FormData();
+
+      if (formData.articlePdf) {
+        formDataToSend.append("pdf", formData.articlePdf);
+      }
+
+      const {
+        articlePdf, // exclude file from metadata
+        ...meta
+      } = formData;
+
+      formDataToSend.append("metadata", JSON.stringify(meta));
+
+      const res = await fetch("http://localhost:5000/api/drafts", {
+        method: "POST",
+        body: formDataToSend,
+      });
+
+      const data = await res.json();
+
+      if (!data.success) throw new Error(data.message);
+
+      alert("✅ Draft submitted! ID: " + data.draftId);
+      // Optionally: router.push("/thank-you");
+    } catch (err: any) {
+      alert("❌ Error: " + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -128,7 +158,7 @@ export default function SubmitResearch() {
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Author Information</h2>
               <p className="text-gray-600">Tell us about yourself</p>
             </div>
-            
+
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">First Name *</label>
@@ -229,11 +259,10 @@ export default function SubmitResearch() {
                   <div
                     key={category.id}
                     onClick={() => handleInputChange('category', category.id)}
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      formData.category === category.id
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.category === category.id
                         ? 'border-red-500 bg-red-50'
                         : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                      }`}
                   >
                     <div className="text-center">
                       <div className="text-2xl mb-2">{category.icon}</div>
@@ -340,7 +369,7 @@ export default function SubmitResearch() {
                 <FiBookOpen className="w-5 h-5 text-blue-600 mt-0.5" />
                 <div className="text-sm text-blue-800">
                   <strong>Article Requirements:</strong><br />
-                  Please ensure your PDF includes: title page, abstract, introduction, methodology, results, 
+                  Please ensure your PDF includes: title page, abstract, introduction, methodology, results,
                   discussion, conclusion, and references. The article should be well-formatted and ready for review.
                 </div>
               </div>
@@ -405,7 +434,7 @@ export default function SubmitResearch() {
                   className="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
                 />
                 <span className="text-sm text-gray-700">
-                  I agree to the <a href="#" className="text-red-600 hover:underline">terms and conditions</a> and 
+                  I agree to the <a href="#" className="text-red-600 hover:underline">terms and conditions</a> and
                   <a href="#" className="text-red-600 hover:underline ml-1">publication guidelines</a>.
                 </span>
               </label>
@@ -416,7 +445,7 @@ export default function SubmitResearch() {
                 <FiClock className="w-5 h-5 text-blue-600 mt-0.5" />
                 <div className="text-sm text-blue-800">
                   <strong>What happens next?</strong><br />
-                  Your submission will be reviewed by our editorial team within 7-10 business days. 
+                  Your submission will be reviewed by our editorial team within 7-10 business days.
                   You'll receive an email notification with the review outcome.
                 </div>
               </div>
@@ -432,7 +461,7 @@ export default function SubmitResearch() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <div className="container mx-auto px-6 py-12">
         {/* Progress Bar */}
         <div className="max-w-4xl mx-auto mb-8">
@@ -440,19 +469,17 @@ export default function SubmitResearch() {
             {[1, 2, 3].map((step) => (
               <div key={step} className="flex items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                    step <= currentStep
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${step <= currentStep
                       ? 'bg-red-600 text-white'
                       : 'bg-gray-200 text-gray-600'
-                  }`}
+                    }`}
                 >
                   {step < currentStep ? <FiCheck /> : step}
                 </div>
                 {step < 3 && (
                   <div
-                    className={`w-full h-1 mx-4 ${
-                      step < currentStep ? 'bg-red-600' : 'bg-gray-200'
-                    }`}
+                    className={`w-full h-1 mx-4 ${step < currentStep ? 'bg-red-600' : 'bg-gray-200'
+                      }`}
                   />
                 )}
               </div>
@@ -473,11 +500,10 @@ export default function SubmitResearch() {
               <button
                 onClick={prevStep}
                 disabled={currentStep === 1}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
-                  currentStep === 1
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${currentStep === 1
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+                  }`}
               >
                 <FiArrowLeft />
                 Previous
@@ -488,11 +514,10 @@ export default function SubmitResearch() {
                   <button
                     onClick={nextStep}
                     disabled={!validateStep(currentStep)}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
-                      validateStep(currentStep)
+                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${validateStep(currentStep)
                         ? 'bg-red-600 text-white hover:bg-red-700'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    }`}
+                      }`}
                   >
                     Next
                     <FiArrowRight />
@@ -501,11 +526,10 @@ export default function SubmitResearch() {
                   <button
                     onClick={handleSubmit}
                     disabled={!validateStep(currentStep) || isSubmitting}
-                    className={`flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all ${
-                      validateStep(currentStep) && !isSubmitting
+                    className={`flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all ${validateStep(currentStep) && !isSubmitting
                         ? 'bg-gradient-to-r from-red-600 to-blue-600 text-white hover:from-red-700 hover:to-blue-700'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    }`}
+                      }`}
                   >
                     {isSubmitting ? (
                       <>
