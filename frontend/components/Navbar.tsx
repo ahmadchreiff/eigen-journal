@@ -1,7 +1,8 @@
-import Link from 'next/link'; 
+import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { FiBookmark, FiUser, FiSearch, FiMenu, FiX, FiChevronDown, FiPlusCircle } from 'react-icons/fi';
+import Image from 'next/image';
 
 export default function Navbar() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function Navbar() {
   useEffect(() => {
     const path = router.pathname;
     const query = router.query;
-    
+
     if (path === '/') {
       setActiveSection('home');
     } else if (path === '/about') {
@@ -63,8 +64,8 @@ export default function Navbar() {
       )}
 
       <header className={`fixed top-0 w-full z-50 transition-all duration-500 ease-out ${isScrolled
-          ? 'bg-white/95 backdrop-blur-xl shadow-lg shadow-red-900/5 border-b border-red-100/50'
-          : 'bg-gradient-to-b from-red-900 via-red-800 to-red-900'
+        ? 'bg-white/95 backdrop-blur-xl shadow-lg shadow-red-900/5 border-b border-red-100/50'
+        : 'bg-gradient-to-b from-red-900 via-red-800 to-red-900'
         }`}>
 
         {/* Subtle animated background pattern */}
@@ -82,25 +83,32 @@ export default function Navbar() {
             <div className="flex items-center gap-4 group">
               <div className="relative">
                 <div className={`w-10 h-10 lg:w-12 lg:h-12 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-all duration-300 ${isScrolled
-                    ? 'bg-gradient-to-br from-red-600 to-red-700 shadow-lg shadow-red-600/20'
-                    : 'bg-white/20 backdrop-blur-sm border border-white/30'
+                  ? 'bg-gradient-to-br from-red-600 to-red-700 shadow-lg shadow-red-600/20'
+                  : 'bg-white/20 backdrop-blur-sm border border-white/30'
                   }`}>
-                  <span className={`font-bold text-lg lg:text-xl ${isScrolled ? 'text-white' : 'text-white'
-                    }`}>Σ</span>
+                  {/* <span className={`font-bold text-lg lg:text-xl ${isScrolled ? 'text-white' : 'text-white'
+                    }`}>Σ</span> */}
+                  <Image
+                    src="/logo.png"
+                    alt="Eigen Journal Logo"
+                    width={48}
+                    height={48}
+                    className="rounded-md object-contain"
+                  />
                 </div>
               </div>
 
               <div>
                 <h1 className={`text-xl lg:text-2xl font-light tracking-tight ${isScrolled
-                    ? 'text-gray-900'
-                    : 'text-white'
+                  ? 'text-gray-900'
+                  : 'text-white'
                   }`}>
                   <span className="font-normal">The</span>{' '}
                   <span className="font-semibold">Eigen Journal</span>
                 </h1>
                 <p className={`text-xs lg:text-sm font-light tracking-wider ${isScrolled
-                    ? 'text-red-600'
-                    : 'text-red-200'
+                  ? 'text-red-600'
+                  : 'text-red-200'
                   }`}>
                   American University of Beirut
                 </p>
@@ -110,16 +118,16 @@ export default function Navbar() {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => (
-                <Link 
-                  key={item.id} 
+                <Link
+                  key={item.id}
                   href={item.href}
                   className={`relative px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${activeSection === item.id
-                      ? isScrolled
-                        ? 'text-red-700 bg-red-50 shadow-sm'
-                        : 'text-white bg-white/20 backdrop-blur-sm'
-                      : isScrolled
-                        ? 'text-gray-700 hover:text-red-600 hover:bg-red-50'
-                        : 'text-red-100 hover:text-white hover:bg-white/10'
+                    ? isScrolled
+                      ? 'text-red-700 bg-red-50 shadow-sm'
+                      : 'text-white bg-white/20 backdrop-blur-sm'
+                    : isScrolled
+                      ? 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                      : 'text-red-100 hover:text-white hover:bg-white/10'
                     }`}
                 >
                   {item.label}
@@ -129,17 +137,17 @@ export default function Navbar() {
                   )}
                 </Link>
               ))}
-              
+
               {/* Submit Button - Special styling */}
-              <Link 
+              <Link
                 href="/submit"
                 className={`relative px-4 py-2 ml-2 rounded-lg font-semibold text-sm transition-all duration-300 flex items-center gap-2 ${activeSection === 'submit'
-                    ? isScrolled
-                      ? 'text-white bg-gradient-to-r from-red-600 to-blue-600 shadow-lg shadow-red-600/30'
-                      : 'text-white bg-white/30 backdrop-blur-sm border border-white/50'
-                    : isScrolled
-                      ? 'text-white bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 shadow-lg shadow-red-600/20'
-                      : 'text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30'
+                  ? isScrolled
+                    ? 'text-white bg-gradient-to-r from-red-600 to-blue-600 shadow-lg shadow-red-600/30'
+                    : 'text-white bg-white/30 backdrop-blur-sm border border-white/50'
+                  : isScrolled
+                    ? 'text-white bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 shadow-lg shadow-red-600/20'
+                    : 'text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30'
                   }`}
               >
                 <FiPlusCircle className="w-4 h-4" />
@@ -161,8 +169,8 @@ export default function Navbar() {
                     <button
                       onClick={() => setSearchFocused(true)}
                       className={`w-9 h-9 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center transition-all duration-300 ${isScrolled
-                          ? 'text-gray-600 hover:text-red-600 hover:bg-red-50'
-                          : 'text-red-100 hover:text-white hover:bg-white/10'
+                        ? 'text-gray-600 hover:text-red-600 hover:bg-red-50'
+                        : 'text-red-100 hover:text-white hover:bg-white/10'
                         }`}
                     >
                       <FiSearch className="w-4 h-4 lg:w-5 lg:h-5" />
@@ -173,8 +181,8 @@ export default function Navbar() {
                         type="text"
                         placeholder="Search articles..."
                         className={`h-9 lg:h-10 w-56 lg:w-64 pl-4 pr-10 rounded-lg text-sm transition-all duration-300 focus:outline-none focus:ring-2 ${isScrolled
-                            ? 'bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:ring-red-500 focus:border-red-500'
-                            : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-red-200 focus:ring-white focus:border-white'
+                          ? 'bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:ring-red-500 focus:border-red-500'
+                          : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-red-200 focus:ring-white focus:border-white'
                           }`}
                         autoFocus
                         onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
@@ -194,15 +202,15 @@ export default function Navbar() {
               {/* Action Buttons - Minimalist */}
               <div className="hidden sm:flex items-center gap-1 lg:gap-2">
                 <button className={`w-9 h-9 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center transition-all duration-300 group ${isScrolled
-                    ? 'text-gray-600 hover:text-red-600 hover:bg-red-50'
-                    : 'text-red-100 hover:text-white hover:bg-white/10'
+                  ? 'text-gray-600 hover:text-red-600 hover:bg-red-50'
+                  : 'text-red-100 hover:text-white hover:bg-white/10'
                   }`}>
                   <FiBookmark className="w-4 h-4 lg:w-5 lg:h-5 group-hover:scale-110 transition-transform" />
                 </button>
 
                 <button className={`w-9 h-9 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-105 ${isScrolled
-                    ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20'
-                    : 'bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30'
+                  ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20'
+                  : 'bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30'
                   }`}>
                   <FiUser className="w-4 h-4 lg:w-5 lg:h-5" />
                 </button>
@@ -212,8 +220,8 @@ export default function Navbar() {
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className={`lg:hidden w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300 ${isScrolled
-                    ? 'text-gray-600 hover:text-red-600 hover:bg-red-50'
-                    : 'text-red-100 hover:text-white hover:bg-white/10'
+                  ? 'text-gray-600 hover:text-red-600 hover:bg-red-50'
+                  : 'text-red-100 hover:text-white hover:bg-white/10'
                   }`}
               >
                 {isMobileMenuOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
@@ -249,14 +257,14 @@ export default function Navbar() {
                     setIsMobileMenuOpen(false);
                   }}
                   className={`block w-full text-left px-4 py-3 font-medium transition-all duration-200 ${activeSection === item.id
-                      ? 'text-red-700 bg-red-50 border-r-2 border-red-600'
-                      : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                    ? 'text-red-700 bg-red-50 border-r-2 border-red-600'
+                    : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
                     }`}
                 >
                   {item.label}
                 </Link>
               ))}
-              
+
               {/* Mobile Submit Button */}
               <Link
                 href="/submit"
@@ -264,8 +272,8 @@ export default function Navbar() {
                   setIsMobileMenuOpen(false);
                 }}
                 className={`block w-full text-left px-4 py-3 font-semibold transition-all duration-200 flex items-center gap-2 ${activeSection === 'submit'
-                    ? 'text-white bg-gradient-to-r from-red-600 to-blue-600 border-r-2 border-blue-600'
-                    : 'text-white bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700'
+                  ? 'text-white bg-gradient-to-r from-red-600 to-blue-600 border-r-2 border-blue-600'
+                  : 'text-white bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700'
                   }`}
               >
                 <FiPlusCircle className="w-4 h-4" />

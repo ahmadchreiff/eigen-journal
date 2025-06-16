@@ -23,13 +23,8 @@ interface FormData {
   category: string;
   keywords: string[];
   
-  // Content
-  content: string;
-  references: string;
-  
   // Files
-  manuscript: File | null;
-  supplementaryFiles: File[];
+  articlePdf: File | null;
   
   // Metadata
   isOriginalWork: boolean;
@@ -51,10 +46,7 @@ export default function SubmitResearch() {
     abstract: '',
     category: '',
     keywords: [],
-    content: '',
-    references: '',
-    manuscript: null,
-    supplementaryFiles: [],
+    articlePdf: null,
     isOriginalWork: false,
     hasEthicsApproval: false,
     agreedToTerms: false
@@ -64,7 +56,7 @@ export default function SubmitResearch() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
-  const totalSteps = 5;
+  const totalSteps = 3;
   const categories = [
     { id: 'cmps', name: 'Computer Science', icon: '💻', color: 'from-blue-500 to-red-600' },
     { id: 'math', name: 'Mathematics', icon: '🔢', color: 'from-green-500 to-teal-600' },
@@ -88,14 +80,9 @@ export default function SubmitResearch() {
     handleInputChange('keywords', formData.keywords.filter(k => k !== keyword));
   };
 
-  const handleFileUpload = (field: 'manuscript' | 'supplementaryFiles', files: FileList | null) => {
-    if (!files) return;
-    
-    if (field === 'manuscript') {
-      handleInputChange('manuscript', files[0]);
-    } else {
-      const newFiles = Array.from(files);
-      handleInputChange('supplementaryFiles', [...formData.supplementaryFiles, ...newFiles]);
+  const handleFileUpload = (files: FileList | null) => {
+    if (files && files[0]) {
+      handleInputChange('articlePdf', files[0]);
     }
   };
 
@@ -104,12 +91,8 @@ export default function SubmitResearch() {
       case 1:
         return !!(formData.firstName && formData.lastName && formData.email && formData.studentId);
       case 2:
-        return !!(formData.title && formData.abstract && formData.category);
+        return !!(formData.title && formData.abstract && formData.category && formData.keywords.length > 0 && formData.articlePdf);
       case 3:
-        return !!(formData.content && formData.keywords.length > 0);
-      case 4:
-        return !!formData.manuscript;
-      case 5:
         return formData.isOriginalWork && formData.agreedToTerms;
       default:
         return true;
@@ -224,8 +207,8 @@ export default function SubmitResearch() {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Research Details</h2>
-              <p className="text-gray-600">Provide information about your research</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Research Details & Article Upload</h2>
+              <p className="text-gray-600">Provide information about your research and upload your PDF article</p>
             </div>
 
             <div>
@@ -274,16 +257,6 @@ export default function SubmitResearch() {
                 {formData.abstract.length} characters
               </div>
             </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Content & Keywords</h2>
-              <p className="text-gray-600">Add your research content and relevant keywords</p>
-            </div>
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Keywords *</label>
@@ -322,107 +295,60 @@ export default function SubmitResearch() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Main Content *</label>
-              <textarea
-                value={formData.content}
-                onChange={(e) => handleInputChange('content', e.target.value)}
-                rows={12}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
-                placeholder="Write your research content here. You can use Markdown formatting."
-              />
-              <div className="text-sm text-gray-500 mt-1">
-                {formData.content.length} characters • Markdown supported
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">References</label>
-              <textarea
-                value={formData.references}
-                onChange={(e) => handleInputChange('references', e.target.value)}
-                rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
-                placeholder="List your references and citations here"
-              />
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">File Upload</h2>
-              <p className="text-gray-600">Upload your manuscript and supplementary materials</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Manuscript File *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Article PDF *</label>
               <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-red-500 transition-colors">
                 <input
                   type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => handleFileUpload('manuscript', e.target.files)}
+                  accept=".pdf"
+                  onChange={(e) => handleFileUpload(e.target.files)}
                   className="hidden"
-                  id="manuscript-upload"
+                  id="article-upload"
                 />
-                <label htmlFor="manuscript-upload" className="cursor-pointer">
+                <label htmlFor="article-upload" className="cursor-pointer">
                   <FiUpload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <div className="text-lg font-semibold text-gray-700 mb-2">
-                    {formData.manuscript ? formData.manuscript.name : 'Upload Manuscript'}
+                    {formData.articlePdf ? formData.articlePdf.name : 'Upload Your Research Article'}
                   </div>
                   <div className="text-sm text-gray-500">
-                    PDF, DOC, or DOCX files only • Max 10MB
+                    PDF files only • Max 25MB • Should include your complete research with references
                   </div>
                 </label>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Supplementary Files</label>
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-red-500 transition-colors">
-                <input
-                  type="file"
-                  multiple
-                  accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.zip"
-                  onChange={(e) => handleFileUpload('supplementaryFiles', e.target.files)}
-                  className="hidden"
-                  id="supplementary-upload"
-                />
-                <label htmlFor="supplementary-upload" className="cursor-pointer">
-                  <FiImage className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <div className="text-lg font-semibold text-gray-700 mb-2">Upload Additional Files</div>
-                  <div className="text-sm text-gray-500">
-                    Images, data files, code, etc. • Optional
-                  </div>
-                </label>
-              </div>
-              {formData.supplementaryFiles.length > 0 && (
-                <div className="mt-4">
-                  <div className="text-sm font-semibold text-gray-700 mb-2">Uploaded Files:</div>
-                  <div className="space-y-2">
-                    {formData.supplementaryFiles.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                        <span className="text-sm text-gray-700">{file.name}</span>
-                        <button
-                          onClick={() => {
-                            const newFiles = formData.supplementaryFiles.filter((_, i) => i !== index);
-                            handleInputChange('supplementaryFiles', newFiles);
-                          }}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <FiX />
-                        </button>
+              {formData.articlePdf && (
+                <div className="mt-4 flex items-center justify-between bg-green-50 border border-green-200 p-4 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <FiFileText className="w-5 h-5 text-green-600" />
+                    <div>
+                      <div className="text-sm font-semibold text-green-800">{formData.articlePdf.name}</div>
+                      <div className="text-xs text-green-600">
+                        {(formData.articlePdf.size / 1024 / 1024).toFixed(2)} MB
                       </div>
-                    ))}
+                    </div>
                   </div>
+                  <button
+                    onClick={() => handleInputChange('articlePdf', null)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <FiX size={20} />
+                  </button>
                 </div>
               )}
             </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <FiBookOpen className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div className="text-sm text-blue-800">
+                  <strong>Article Requirements:</strong><br />
+                  Please ensure your PDF includes: title page, abstract, introduction, methodology, results, 
+                  discussion, conclusion, and references. The article should be well-formatted and ready for review.
+                </div>
+              </div>
+            </div>
           </div>
         );
 
-      case 5:
+      case 3:
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
@@ -435,10 +361,14 @@ export default function SubmitResearch() {
               <div className="grid md:grid-cols-2 gap-4 text-sm">
                 <div><strong>Author:</strong> {formData.firstName} {formData.lastName}</div>
                 <div><strong>Email:</strong> {formData.email}</div>
+                <div><strong>Student ID:</strong> {formData.studentId}</div>
+                <div><strong>Academic Year:</strong> {formData.year || 'Not specified'}</div>
+                <div><strong>Major:</strong> {formData.major || 'Not specified'}</div>
                 <div><strong>Title:</strong> {formData.title}</div>
                 <div><strong>Category:</strong> {categories.find(c => c.id === formData.category)?.name}</div>
                 <div><strong>Keywords:</strong> {formData.keywords.join(', ')}</div>
-                <div><strong>Manuscript:</strong> {formData.manuscript?.name || 'None'}</div>
+                <div><strong>Article PDF:</strong> {formData.articlePdf?.name || 'None'}</div>
+                <div><strong>Abstract Length:</strong> {formData.abstract.length} characters</div>
               </div>
             </div>
 
@@ -507,7 +437,7 @@ export default function SubmitResearch() {
         {/* Progress Bar */}
         <div className="max-w-4xl mx-auto mb-8">
           <div className="flex items-center justify-between mb-4">
-            {[1, 2, 3, 4, 5].map((step) => (
+            {[1, 2, 3].map((step) => (
               <div key={step} className="flex items-center">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
@@ -518,7 +448,7 @@ export default function SubmitResearch() {
                 >
                   {step < currentStep ? <FiCheck /> : step}
                 </div>
-                {step < 5 && (
+                {step < 3 && (
                   <div
                     className={`w-full h-1 mx-4 ${
                       step < currentStep ? 'bg-red-600' : 'bg-gray-200'
@@ -615,7 +545,7 @@ export default function SubmitResearch() {
               <div className="flex items-start gap-3">
                 <FiTrendingUp className="w-5 h-5 text-red-600 mt-0.5" />
                 <div>
-                  <strong>Impact:</strong> We prioritize research with potential for significant academic impact.
+                  <strong>Complete PDF:</strong> Submit your full research article as a single PDF with all sections and references.
                 </div>
               </div>
             </div>
