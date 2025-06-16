@@ -57,7 +57,8 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-red-900 to-slate-900 text-white">
-        <div className="absolute inset-0 bg-[url('https://picsum.photos/1920/1080')] bg-cover bg-center opacity-10"></div>
+        {/* <div className="absolute inset-0 bg-[url('https://picsum.photos/1920/1080')] bg-cover bg-center opacity-10"></div> */}
+        <div className="absolute inset-0 bg-[url('https://picsum.photos/seed/quantum123/1920/1080')] bg-cover bg-center opacity-20"></div>
         <div className="relative container mx-auto px-6 py-24 lg:py-32">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-red-200 to-white bg-clip-text text-transparent">
