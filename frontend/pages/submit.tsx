@@ -130,7 +130,7 @@ export default function SubmitResearch() {
 
       formDataToSend.append("metadata", JSON.stringify(meta));
 
-      const res = await fetch("http://localhost:5000/api/drafts", {
+      const res = await fetch("http://localhost:8080/api/drafts", {
         method: "POST",
         body: formDataToSend,
       });

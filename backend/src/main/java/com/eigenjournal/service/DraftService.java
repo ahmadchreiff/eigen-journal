@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @Service
 public class DraftService {
@@ -39,7 +40,11 @@ public class DraftService {
         draft.setTitle(request.title);
         draft.setAbstractText(request.abstractText);
         draft.setCategory(request.category);
-        draft.setKeywords(request.keywords);
+        // draft.setKeywords(request.keywords);
+        draft.setKeywords(
+                request.getKeywords() == null
+                        ? null
+                        : request.getKeywords().stream().collect(Collectors.joining(",")));
         draft.setPdfFileName(storedFileName);
         draft.setCreatedAt(LocalDateTime.now());
         draft.setStatus("PENDING_REVIEW");

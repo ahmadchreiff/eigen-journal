@@ -1,5 +1,9 @@
 package com.eigenjournal.dto;
 
+import java.util.List;        // add
+import lombok.Data;
+
+@Data
 public class DraftRequest {
 
     // --- Author info ---
@@ -15,7 +19,7 @@ public class DraftRequest {
     public String title;
     public String abstractText;
     public String category;   // cmps, math, phys
-    public String keywords;   // comma-separated
+    public List<String> keywords;   // ← was String
 
     // You can later add validation annotations like @NotBlank, @Email, etc.
 }
