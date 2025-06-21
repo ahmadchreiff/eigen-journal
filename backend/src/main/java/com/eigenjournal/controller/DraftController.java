@@ -9,6 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -78,4 +86,30 @@ public class DraftController {
                         .body(Map.of("error", "Draft not found"));
     }
 
+    /**
+     * ─────────────────────────────────────────────
+     * GET /api/drafts/{id}/pdf → stream PDF
+     * ────────────────────────────────────────────
+     */
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<Resource> downloadPdf(@PathVariable Long id) throws Exception {
+        Draft draft = draftService.getDraft(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Draft not found"));
+
+        Path filePath = Paths.get(System.getProperty("user.dir"), "uploads")
+                .resolve(draft.getPdfFileName())
+                .normalize();
+
+        Resource resource = new UrlResource(filePath.toUri());
+        if (!resource.exists()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PDF not found on disk");
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                // “inline” → opens in browser; change to “attachment” to force download
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" + draft.getPdfFileName() + "\"")
+                .body(resource);
+    }
 }
