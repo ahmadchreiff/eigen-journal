@@ -30,26 +30,20 @@ export default function Navbar() {
       setActiveSection('about');
     } else if (path === '/submit') {
       setActiveSection('submit');
+    } else if (path === '/drafts') {
+      setActiveSection('drafts');
     } else if (path === '/articles') {
-      if (query.category === 'cmps') {
-        setActiveSection('cmps');
-      } else if (query.category === 'math') {
-        setActiveSection('math');
-      } else if (query.category === 'phys') {
-        setActiveSection('phys');
-      } else {
-        setActiveSection('home'); // Default fallback
-      }
-    } else {
+      setActiveSection('articles');
+    }
+    else {
       setActiveSection('home'); // Default fallback
     }
   }, [router.pathname, router.query]);
 
   const navItems = [
     { id: 'home', label: 'Home', href: '/' },
-    { id: 'cmps', label: 'Computer Science', href: '/cmps' },
-    { id: 'math', label: 'Mathematics', href: '/math' },
-    { id: 'phys', label: 'Physics', href: '/phys' },
+    { id: 'articles', label: 'Read Articles', href: '/articles' },
+    { id: 'drafts', label: 'Manage Articles', href: '/drafts' },
     { id: 'about', label: 'About', href: '/about' }
   ];
 
