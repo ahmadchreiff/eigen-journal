@@ -41,6 +41,46 @@ export default function DraftDetails() {
     })();
   }, [id]);
 
+  /* ------------------------------------------------------------------ */
+  /*  helpers: updateStatus & deleteDraft                              */
+  /* ------------------------------------------------------------------ */
+  const updateStatus = async (newStatus: string) => {
+    if (!id) return;
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/drafts/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+      if (!res.ok) throw new Error("Failed to update status");
+      // refresh local state so UI updates
+      setDraft({ ...(draft as Draft), status: newStatus });
+      alert(`Status set to ${newStatus}`);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const deleteDraft = async () => {
+    if (!id) return;
+    if (!confirm("Delete this draft permanently?")) return;
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/drafts/${id}`,
+        { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error("Failed to delete draft");
+      alert("Draft deleted");
+      router.push("/drafts");     // go back to list
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -70,8 +110,8 @@ export default function DraftDetails() {
                   (draft.status === "APPROVED"
                     ? "bg-green-100 text-green-700"
                     : draft.status === "REJECTED"
-                    ? "bg-red-100 text-red-700"
-                    : "bg-yellow-100 text-yellow-700")
+                      ? "bg-red-100 text-red-700"
+                      : "bg-yellow-100 text-yellow-700")
                 }
               >
                 {draft.status}
@@ -92,6 +132,27 @@ export default function DraftDetails() {
             </a>
           </div>
         )}
+        {/* --- moderation buttons --- */}
+        <div className="mt-8 flex gap-4">
+          <button
+            onClick={() => updateStatus("APPROVED")}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            ✅ Approve
+          </button>
+          <button
+            onClick={() => updateStatus("REJECTED")}
+            className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+          >
+            ❌ Reject
+          </button>
+          <button
+            onClick={deleteDraft}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            🗑 Delete
+          </button>
+        </div>
       </div>
 
       <Bottombar />
