@@ -32,8 +32,10 @@ export default function ApprovedArticlesPage() {
     })();
   }, []);
 
-  // Directly use allDrafts without any filtering
-  const articlesToDisplay = allDrafts;
+  // Only show articles with approved status
+  const articlesToDisplay = allDrafts.filter(
+    (d) => d.status === "APPROVED"          // status must match backend string exactly
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
