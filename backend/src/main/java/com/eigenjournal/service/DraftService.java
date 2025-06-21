@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DraftService {
@@ -54,4 +56,29 @@ public class DraftService {
 
         return savedDraft.getId();
     }
+
+    public List<Draft> getAllDrafts() {
+        return draftRepository.findAll(); // Spring Data gives this for free
+    }
+
+    public Optional<Draft> getDraft(Long id) {
+        return draftRepository.findById(id);
+    }
+
+    public boolean deleteDraft(Long id) {
+        return draftRepository.findById(id).map(d -> {
+            fileStorageUtil.deletePdf(d.getPdfFileName()); // util already handles missing file
+            draftRepository.delete(d);
+            return true;
+        }).orElse(false);
+    }
+
+    public boolean updateStatus(Long id, String status) {
+        return draftRepository.findById(id).map(d -> {
+            d.setStatus(status);
+            draftRepository.save(d);
+            return true;
+        }).orElse(false);
+    }
+
 }

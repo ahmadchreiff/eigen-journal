@@ -33,4 +33,11 @@ public class FileStorageUtil {
 
         return newFilename; // store just the filename in DB
     }
+
+    public void deletePdf(String filename) {
+    Path path = Paths.get(System.getProperty("user.dir"), "uploads", filename);
+    try { Files.deleteIfExists(path); }
+    catch (IOException e) { e.printStackTrace(); }
+}
+
 }

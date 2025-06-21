@@ -35,5 +35,5 @@ public class Draft {
     private String status;           // PENDING_REVIEW
 
     /* getters and setters omitted for brevity;
-       use Lombok later or generate in IDE. Used lombok*/
+       using Lombok. */
 }
