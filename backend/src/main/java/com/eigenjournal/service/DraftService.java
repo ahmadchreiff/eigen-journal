@@ -7,6 +7,9 @@ import com.eigenjournal.util.FileStorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -57,8 +60,12 @@ public class DraftService {
         return savedDraft.getId();
     }
 
+
     public List<Draft> getAllDrafts() {
-        return draftRepository.findAll(); // Spring Data gives this for free
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName(); // same as user.getEmail()
+        
+        return draftRepository.findByEmail(email); // Spring Data gives this for free
     }
 
     public Optional<Draft> getDraft(Long id) {
