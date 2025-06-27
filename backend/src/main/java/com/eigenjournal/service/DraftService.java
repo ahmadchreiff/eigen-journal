@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -60,12 +62,18 @@ public class DraftService {
         return savedDraft.getId();
     }
 
-
     public List<Draft> getAllDrafts() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName(); // same as user.getEmail()
-        
+
         return draftRepository.findByEmail(email); // Spring Data gives this for free
+    }
+
+    @Transactional(readOnly = true)
+    public List<Draft> getDraftsForCurrentStudent() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName(); // The student's email
+        return draftRepository.findByEmail(email);
     }
 
     public Optional<Draft> getDraft(Long id) {

@@ -60,13 +60,19 @@ public class DraftController {
         // @PreAuthorize("hasRole('EDITOR')")
         // @GetMapping // GET /api/drafts
         // public List<Draft> getAllDrafts() {
-        //         return draftService.getAllDrafts(); // returns List<Draft>
+        // return draftService.getAllDrafts(); // returns List<Draft>
         // }
 
         @PreAuthorize("hasRole('EDITOR')")
         @GetMapping("/all")
         public ResponseEntity<List<Draft>> getAllDrafts() {
                 return ResponseEntity.ok(draftService.getAllDrafts());
+        }
+
+        @PreAuthorize("hasRole('STUDENT')")
+        @GetMapping("/my")
+        public List<Draft> getMyDrafts() {
+                return draftService.getDraftsForCurrentStudent();
         }
 
         @GetMapping("/{id}") // GET /api/drafts/7
