@@ -1,5 +1,6 @@
 package com.eigenjournal.controller;
 
+
 import com.eigenjournal.dto.DraftRequest;
 import com.eigenjournal.model.Draft;
 import com.eigenjournal.service.DraftService;
@@ -15,6 +16,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -55,6 +57,7 @@ public class DraftController {
         return response;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping // GET /api/drafts
     public List<Draft> getAllDrafts() {
         return draftService.getAllDrafts(); // returns List<Draft>
@@ -68,6 +71,7 @@ public class DraftController {
                         .body(Map.of("error", "Draft not found")));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}") // DELETE /api/drafts/7
     public ResponseEntity<?> deleteDraft(@PathVariable Long id) {
         boolean ok = draftService.deleteDraft(id);
@@ -76,6 +80,7 @@ public class DraftController {
                         .body(Map.of("error", "Draft not found"));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}") // PUT /api/drafts/7
     public ResponseEntity<?> updateStatus(@PathVariable Long id,
             @RequestBody Map<String, String> body) {
@@ -91,6 +96,7 @@ public class DraftController {
      * GET /api/drafts/{id}/pdf → stream PDF
      * ────────────────────────────────────────────
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}/pdf")
     public ResponseEntity<Resource> downloadPdf(@PathVariable Long id) throws Exception {
         Draft draft = draftService.getDraft(id)
