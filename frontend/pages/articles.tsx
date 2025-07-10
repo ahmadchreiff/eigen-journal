@@ -29,11 +29,12 @@ export default function ApprovedArticlesPage() {
     (async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8080/api/drafts", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
+        // const res = await fetch("http://localhost:8080/api/drafts", {
+        //   headers: {
+        //     "Authorization": `Bearer ${token}`
+        //   }
+        // });
+        const res = await fetch("http://localhost:8080/api/drafts/approved");
 
         if (!res.ok) {
           throw new Error(`Error ${res.status}: ${res.statusText}`);

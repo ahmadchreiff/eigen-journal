@@ -81,4 +81,8 @@ public class DraftService {
         }).orElse(false);
     }
 
+    public List<Draft> getApprovedDrafts() {
+    return draftRepository.findByStatus("APPROVED");
+}
+
 }

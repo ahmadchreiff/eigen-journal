@@ -43,8 +43,8 @@ public class WebConfig {
                     res.sendError(HttpServletResponse.SC_UNAUTHORIZED, excep.getMessage()))
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers("/api/drafts/**").hasRole("ADMIN")
+                .requestMatchers("/api/auth/login", "/api/drafts/approved").permitAll()   // ✅ public endpoints
+                .requestMatchers("/api/drafts/**").hasRole("ADMIN")                       // 🔒 all other drafts endpoints
                 .anyRequest().permitAll()
             )
             .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);

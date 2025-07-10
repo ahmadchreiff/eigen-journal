@@ -22,7 +22,12 @@ import {
   FileCheck,
   Trash2,
   Check,
-  X
+  X,
+  LogOut,
+  Settings,
+  Shield,
+  Bell,
+  ChevronDown
 } from "lucide-react";
 
 interface Draft {
@@ -56,15 +61,15 @@ export default function DraftList() {
   const [sortBy, setSortBy] = useState("newest");
   const [stats, setStats] = useState<Stats>({ total: 0, approved: 0, rejected: 0, pending: 0 });
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [showAdminMenu, setShowAdminMenu] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
+  const { logout } = useAuth();
 
   useEffect(() => {
     if (user === null) {
-      // Not logged in → redirect to login page
       router.push("/login");
     } else if (user.role !== "ADMIN") {
-      // Logged in but not admin → redirect to home
       router.push("/");
     }
   }, [user, router]);
@@ -110,7 +115,6 @@ export default function DraftList() {
       return matchesSearch && matchesStatus;
     });
 
-    // Sort
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "newest":
@@ -147,7 +151,6 @@ export default function DraftList() {
 
       if (!res.ok) throw new Error("Failed to update status");
 
-      // Update local state
       const updatedDrafts = drafts.map(draft =>
         draft.id === draftId ? { ...draft, status: newStatus } : draft
       );
@@ -167,21 +170,20 @@ export default function DraftList() {
 
     setActionLoading(draftId);
     try {
-      const token = localStorage.getItem("token");  // ✅ get token
+      const token = localStorage.getItem("token");
 
       const res = await fetch(
         `http://localhost:8080/api/drafts/${draftId}`,
         {
           method: "DELETE",
           headers: {
-            "Authorization": `Bearer ${token}`    // ✅ pass token in header
+            "Authorization": `Bearer ${token}`
           }
         }
       );
 
       if (!res.ok) throw new Error("Failed to delete draft");
 
-      // Update local state
       const updatedDrafts = drafts.filter(draft => draft.id !== draftId);
       setDrafts(updatedDrafts);
       calculateStats(updatedDrafts);
@@ -193,7 +195,6 @@ export default function DraftList() {
       setActionLoading(null);
     }
   };
-
 
   const openPDF = (draftId: number) => {
     window.open(`http://localhost:8080/api/drafts/${draftId}/pdf`, '_blank');
@@ -219,6 +220,11 @@ export default function DraftList() {
       default:
         return "bg-yellow-50 text-yellow-700 border-yellow-200";
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
   };
 
   if (loading) {
@@ -251,64 +257,150 @@ export default function DraftList() {
   }
 
   if (!user || user.role !== "ADMIN") {
-    return null;  // Or show <Loading /> spinner if you prefer
+    return null;
   }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
 
       <div className="container mx-auto px-6 py-12">
-        {/* Header */}
+        {/* Enhanced Header with Admin Controls */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Draft Management</h1>
-          <p className="text-slate-600">Review and manage submitted academic drafts</p>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-red-50 rounded-xl">
+                  <Shield className="w-6 h-6 text-red-600" />
+                </div>
+                <h1 className="text-4xl font-bold text-slate-900">Admin Dashboard</h1>
+              </div>
+              <p className="text-slate-600">Review and manage submitted academic drafts</p>
+            </div>
+
+            {/* Admin Controls */}
+            <div className="flex items-center gap-3">
+              {/* Notifications */}
+              <button className="relative p-3 text-slate-600 hover:text-slate-900 hover:bg-white rounded-xl transition-colors">
+                <Bell className="w-5 h-5" />
+                {stats.pending > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {stats.pending}
+                  </span>
+                )}
+              </button>
+
+              {/* Admin Menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowAdminMenu(!showAdminMenu)}
+                  className="flex items-center gap-3 p-3 bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-all"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">
+                      A
+                    </span>
+                  </div>
+                  <div className="text-left hidden sm:block">
+                    <p className="text-sm font-medium text-slate-900">
+                      Admin
+                    </p>
+                    <p className="text-xs text-slate-500">Administrator</p>
+                  </div>
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {showAdminMenu && (
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50">
+                    <div className="px-4 py-2 border-b border-slate-100">
+                      <p className="text-sm font-medium text-slate-900">
+                        Administrator
+                      </p>
+                      <p className="text-xs text-slate-500">Admin Account</p>
+                    </div>
+                    
+                    <button
+                      onClick={() => {/* Handle settings */}}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-left text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      <Settings className="w-4 h-4" />
+                      Settings
+                    </button>
+                    
+                    <button
+                      onClick={() => router.push('/')}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-left text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      <User className="w-4 h-4" />
+                      View as User
+                    </button>
+                    
+                    <div className="border-t border-slate-100 mt-2 pt-2">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-left text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* Enhanced Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all group">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-600">Total Drafts</p>
                 <p className="text-3xl font-bold text-slate-900">{stats.total}</p>
+                <p className="text-xs text-slate-500 mt-1">All submissions</p>
               </div>
-              <div className="p-3 bg-blue-50 rounded-xl">
+              <div className="p-3 bg-blue-50 rounded-xl group-hover:bg-blue-100 transition-colors">
                 <FileText className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all group">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-600">Approved</p>
                 <p className="text-3xl font-bold text-green-600">{stats.approved}</p>
+                <p className="text-xs text-slate-500 mt-1">Ready for publication</p>
               </div>
-              <div className="p-3 bg-green-50 rounded-xl">
+              <div className="p-3 bg-green-50 rounded-xl group-hover:bg-green-100 transition-colors">
                 <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all group">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-600">Rejected</p>
                 <p className="text-3xl font-bold text-red-600">{stats.rejected}</p>
+                <p className="text-xs text-slate-500 mt-1">Needs revision</p>
               </div>
-              <div className="p-3 bg-red-50 rounded-xl">
+              <div className="p-3 bg-red-50 rounded-xl group-hover:bg-red-100 transition-colors">
                 <XCircle className="w-6 h-6 text-red-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all group">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Pending</p>
+                <p className="text-sm font-medium text-slate-600">Pending Review</p>
                 <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
+                <p className="text-xs text-slate-500 mt-1">Awaiting decision</p>
               </div>
-              <div className="p-3 bg-yellow-50 rounded-xl">
+              <div className="p-3 bg-yellow-50 rounded-xl group-hover:bg-yellow-100 transition-colors">
                 <Clock className="w-6 h-6 text-yellow-600" />
               </div>
             </div>
@@ -494,6 +586,14 @@ export default function DraftList() {
           </div>
         )}
       </div>
+
+      {/* Click outside to close admin menu */}
+      {showAdminMenu && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setShowAdminMenu(false)}
+        />
+      )}
 
       <Bottombar />
     </div>
