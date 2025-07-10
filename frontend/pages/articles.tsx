@@ -28,20 +28,36 @@ export default function ApprovedArticlesPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/drafts");
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:8080/api/drafts", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+
         const data = await res.json();
-        setAllDrafts(data);
+        setAllDrafts(data); // ✅ set the drafts array
       } catch (err) {
         console.error("Failed to fetch drafts:", err);
+        setAllDrafts([]); // ✅ fallback: empty array on error
       } finally {
         setLoading(false);
       }
     })();
   }, []);
 
+
   // Filter and sort articles
   const getFilteredAndSortedArticles = () => {
-    let filtered = allDrafts.filter(d => d.status === "APPROVED");
+    // let filtered = allDrafts.filter(d => d.status === "APPROVED");
+    let filtered = Array.isArray(allDrafts)
+      ? allDrafts.filter(d => d.status === "APPROVED")
+      : [];
+
 
     // Filter by category
     if (selectedCategory !== "ALL") {

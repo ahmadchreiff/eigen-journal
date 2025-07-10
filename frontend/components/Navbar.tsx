@@ -30,8 +30,8 @@ export default function Navbar() {
       setActiveSection('about');
     } else if (path === '/submit') {
       setActiveSection('submit');
-    } else if (path === '/drafts') {
-      setActiveSection('drafts');
+    // } else if (path === '/drafts') {
+    //   setActiveSection('drafts');
     } else if (path === '/articles') {
       setActiveSection('articles');
     }
@@ -43,7 +43,7 @@ export default function Navbar() {
   const navItems = [
     { id: 'home', label: 'Home', href: '/' },
     { id: 'articles', label: 'Read Articles', href: '/articles' },
-    { id: 'drafts', label: 'Manage Articles', href: '/drafts' },
+    // { id: 'drafts', label: 'Manage Articles', href: '/drafts' },
     { id: 'about', label: 'About', href: '/about' }
   ];
 

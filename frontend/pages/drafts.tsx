@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Bottombar from "@/components/Bottombar";
+
+import { useAuth } from "@/components/AuthContext";
+import { useRouter } from "next/router";
+
 import {
   Search,
   Filter,
@@ -52,11 +56,28 @@ export default function DraftList() {
   const [sortBy, setSortBy] = useState("newest");
   const [stats, setStats] = useState<Stats>({ total: 0, approved: 0, rejected: 0, pending: 0 });
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user === null) {
+      // Not logged in → redirect to login page
+      router.push("/login");
+    } else if (user.role !== "ADMIN") {
+      // Logged in but not admin → redirect to home
+      router.push("/");
+    }
+  }, [user, router]);
 
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch("http://localhost:8080/api/drafts");
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:8080/api/drafts", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         setDrafts(data);
@@ -67,6 +88,7 @@ export default function DraftList() {
         setLoading(false);
       }
     }
+
     load();
   }, []);
 
@@ -110,23 +132,28 @@ export default function DraftList() {
   const updateStatus = async (draftId: number, newStatus: string) => {
     setActionLoading(draftId);
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(
         `http://localhost:8080/api/drafts/${draftId}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
           body: JSON.stringify({ status: newStatus }),
         }
       );
+
       if (!res.ok) throw new Error("Failed to update status");
-      
+
       // Update local state
-      const updatedDrafts = drafts.map(draft => 
+      const updatedDrafts = drafts.map(draft =>
         draft.id === draftId ? { ...draft, status: newStatus } : draft
       );
       setDrafts(updatedDrafts);
       calculateStats(updatedDrafts);
-      
+
       alert(`Status set to ${newStatus}`);
     } catch (err: any) {
       alert(err.message);
@@ -137,20 +164,28 @@ export default function DraftList() {
 
   const deleteDraft = async (draftId: number) => {
     if (!confirm("Delete this draft permanently?")) return;
-    
+
     setActionLoading(draftId);
     try {
+      const token = localStorage.getItem("token");  // ✅ get token
+
       const res = await fetch(
         `http://localhost:8080/api/drafts/${draftId}`,
-        { method: "DELETE" }
+        {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`    // ✅ pass token in header
+          }
+        }
       );
+
       if (!res.ok) throw new Error("Failed to delete draft");
-      
+
       // Update local state
       const updatedDrafts = drafts.filter(draft => draft.id !== draftId);
       setDrafts(updatedDrafts);
       calculateStats(updatedDrafts);
-      
+
       alert("Draft deleted");
     } catch (err: any) {
       alert(err.message);
@@ -158,6 +193,7 @@ export default function DraftList() {
       setActionLoading(null);
     }
   };
+
 
   const openPDF = (draftId: number) => {
     window.open(`http://localhost:8080/api/drafts/${draftId}/pdf`, '_blank');
@@ -214,6 +250,9 @@ export default function DraftList() {
     );
   }
 
+  if (!user || user.role !== "ADMIN") {
+    return null;  // Or show <Loading /> spinner if you prefer
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
