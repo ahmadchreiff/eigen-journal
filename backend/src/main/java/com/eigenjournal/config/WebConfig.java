@@ -26,28 +26,25 @@ public class WebConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors
-                .configurationSource(request -> {
-                    CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:3000"));
-                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    config.setAllowedHeaders(List.of("*"));
-                    config.setAllowCredentials(true);
-                    return config;
-                })
-            )
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((req, res, excep) ->
-                    res.sendError(HttpServletResponse.SC_UNAUTHORIZED, excep.getMessage()))
-            )
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login", "/api/drafts/approved").permitAll()   // ✅ public endpoints
-                .requestMatchers("/api/drafts/**").hasRole("ADMIN")                       // 🔒 all other drafts endpoints
-                .anyRequest().permitAll()
-            )
-            .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .cors(cors -> cors
+                        .configurationSource(request -> {
+                            CorsConfiguration config = new CorsConfiguration();
+                            config.setAllowedOrigins(List.of("http://localhost:3000"));
+                            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                            config.setAllowedHeaders(List.of("*"));
+                            config.setAllowCredentials(true);
+                            return config;
+                        }))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((req, res, excep) -> res
+                                .sendError(HttpServletResponse.SC_UNAUTHORIZED, excep.getMessage())))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/login", "/api/drafts/approved", "/api/drafts/*/pdf").permitAll()
+                        .requestMatchers("/api/drafts/**").hasRole("ADMIN") // other drafts endpoints require ADMIN
+                        .anyRequest().permitAll())
+                .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

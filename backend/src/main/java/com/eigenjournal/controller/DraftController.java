@@ -100,12 +100,17 @@ public class DraftController {
          * GET /api/drafts/{id}/pdf → stream PDF
          * ────────────────────────────────────────────
          */
-        @PreAuthorize("hasRole('ADMIN')")
+        // @PreAuthorize("hasRole('ADMIN')")
         @GetMapping("/{id}/pdf")
         public ResponseEntity<Resource> downloadPdf(@PathVariable Long id) throws Exception {
                 Draft draft = draftService.getDraft(id)
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                 "Draft not found"));
+
+                if (!"APPROVED".equalsIgnoreCase(draft.getStatus())) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                        "This draft is not approved for public viewing");
+                }
 
                 Path filePath = Paths.get(System.getProperty("user.dir"), "uploads")
                                 .resolve(draft.getPdfFileName())
@@ -118,9 +123,9 @@ public class DraftController {
 
                 return ResponseEntity.ok()
                                 .contentType(MediaType.APPLICATION_PDF)
-                                // “inline” → opens in browser; change to “attachment” to force download
                                 .header(HttpHeaders.CONTENT_DISPOSITION,
                                                 "inline; filename=\"" + draft.getPdfFileName() + "\"")
                                 .body(resource);
         }
+
 }
