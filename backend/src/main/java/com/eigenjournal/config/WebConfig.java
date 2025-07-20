@@ -41,9 +41,18 @@ public class WebConfig {
                         .authenticationEntryPoint((req, res, excep) -> res
                                 .sendError(HttpServletResponse.SC_UNAUTHORIZED, excep.getMessage())))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/drafts/approved", "/api/drafts/*/pdf").permitAll()
-                        .requestMatchers("/api/drafts/**").hasRole("ADMIN") // other drafts endpoints require ADMIN
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/drafts/approved",
+                                "/api/drafts/*/pdf",
+                                "/api/drafts" // POST (submit) allowed public
+                        ).permitAll()
+                        .requestMatchers(
+                                "/api/drafts", // GET → admin (list all drafts)
+                                "/api/drafts/*" // PUT, DELETE → admin (manage specific draft)
+                        ).hasRole("ADMIN")
                         .anyRequest().permitAll())
+
                 .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

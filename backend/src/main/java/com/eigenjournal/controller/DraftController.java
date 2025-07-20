@@ -95,12 +95,6 @@ public class DraftController {
                 return draftService.getApprovedDrafts();
         }
 
-        /**
-         * ─────────────────────────────────────────────
-         * GET /api/drafts/{id}/pdf → stream PDF
-         * ────────────────────────────────────────────
-         */
-        // @PreAuthorize("hasRole('ADMIN')")
         @GetMapping("/{id}/pdf")
         public ResponseEntity<Resource> downloadPdf(@PathVariable Long id) throws Exception {
                 Draft draft = draftService.getDraft(id)

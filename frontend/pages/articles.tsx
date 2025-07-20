@@ -62,7 +62,8 @@ export default function ApprovedArticlesPage() {
 
     // Filter by category
     if (selectedCategory !== "ALL") {
-      filtered = filtered.filter(article => article.category === selectedCategory);
+      // filtered = filtered.filter(article => article.category === selectedCategory);
+      filtered = filtered.filter(article => article.category.toUpperCase() === selectedCategory);
     }
 
     // Filter by search term (title or author)
