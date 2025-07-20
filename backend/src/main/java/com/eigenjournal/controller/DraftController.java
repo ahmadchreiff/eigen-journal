@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/drafts")
+@RequestMapping("/api/drafts") // every endpoint in this file starts with /api/drafts
 @CrossOrigin(origins = "http://localhost:3000") // allow dev frontend access
 public class DraftController {
 
