@@ -260,8 +260,8 @@ export default function SubmitResearch() {
                     key={category.id}
                     onClick={() => handleInputChange('category', category.id)}
                     className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.category === category.id
-                        ? 'border-red-500 bg-red-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-red-500 bg-red-50'
+                      : 'border-gray-200 hover:border-gray-300'
                       }`}
                   >
                     <div className="text-center">
@@ -464,29 +464,55 @@ export default function SubmitResearch() {
 
       <div className="container mx-auto px-6 py-12">
         {/* Progress Bar */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <div className="flex items-center justify-between mb-4">
-            {[1, 2, 3].map((step) => (
-              <div key={step} className="flex items-center">
+        <div className="max-w-4xl mx-auto mb-12">
+          {/* Step indicators and connecting lines */}
+          <div className="relative flex items-center justify-between mb-8">
+            {/* Background line */}
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
+
+            {/* Progress line */}
+            <div
+              className="absolute top-1/2 left-0 h-0.5 bg-gradient-to-r from-red-500 to-red-600 -translate-y-1/2 z-10 transition-all duration-700 ease-out"
+              style={{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }}
+            ></div>
+
+            {/* Step circles */}
+            {[
+              { id: 1, label: 'Author Info' },
+              { id: 2, label: 'Research Details' },
+              { id: 3, label: 'Review & Submit' }
+            ].map((step, index) => (
+              <div key={step.id} className="relative z-20 flex flex-col items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${step <= currentStep
-                      ? 'bg-red-600 text-white'
-                      : 'bg-gray-200 text-gray-600'
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm border-2 transition-all duration-500 ease-out transform ${step.id < currentStep
+                      ? 'bg-red-500 border-red-500 text-white scale-105 shadow-lg shadow-red-200'
+                      : step.id === currentStep
+                        ? 'bg-red-500 border-red-500 text-white scale-110 shadow-xl shadow-red-200 ring-4 ring-red-100'
+                        : 'bg-white border-gray-300 text-gray-400 hover:border-gray-400 hover:text-gray-500'
                     }`}
                 >
-                  {step < currentStep ? <FiCheck /> : step}
+                  {step.id < currentStep ? (
+                    <FiCheck className="w-5 h-5" />
+                  ) : step.id === currentStep ? (
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                  ) : (
+                    step.id
+                  )}
                 </div>
-                {step < 3 && (
+
+                {/* Step label */}
+                <div className="mt-3 text-center">
                   <div
-                    className={`w-full h-1 mx-4 ${step < currentStep ? 'bg-red-600' : 'bg-gray-200'
+                    className={`text-sm font-medium transition-colors duration-300 ${step.id <= currentStep
+                        ? 'text-red-600'
+                        : 'text-gray-400'
                       }`}
-                  />
-                )}
+                  >
+                    {step.label}
+                  </div>
+                </div>
               </div>
             ))}
-          </div>
-          <div className="text-center text-sm text-gray-600">
-            Step {currentStep} of {totalSteps}
           </div>
         </div>
 
@@ -501,8 +527,8 @@ export default function SubmitResearch() {
                 onClick={prevStep}
                 disabled={currentStep === 1}
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${currentStep === 1
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
               >
                 <FiArrowLeft />
@@ -515,8 +541,8 @@ export default function SubmitResearch() {
                     onClick={nextStep}
                     disabled={!validateStep(currentStep)}
                     className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${validateStep(currentStep)
-                        ? 'bg-red-600 text-white hover:bg-red-700'
-                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      ? 'bg-red-600 text-white hover:bg-red-700'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                       }`}
                   >
                     Next
@@ -527,8 +553,8 @@ export default function SubmitResearch() {
                     onClick={handleSubmit}
                     disabled={!validateStep(currentStep) || isSubmitting}
                     className={`flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all ${validateStep(currentStep) && !isSubmitting
-                        ? 'bg-gradient-to-r from-red-600 to-blue-600 text-white hover:from-red-700 hover:to-blue-700'
-                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      ? 'bg-gradient-to-r from-red-600 to-blue-600 text-white hover:from-red-700 hover:to-blue-700'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                       }`}
                   >
                     {isSubmitting ? (
